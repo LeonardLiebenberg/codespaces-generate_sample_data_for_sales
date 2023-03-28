@@ -1,13 +1,12 @@
-# Import required libraries
-# data transformation
 import pandas as pd
 import random,datetime
+import numpy as np
 
 class PseudoData:
     def __init__(self, applications :int, activations :int):
         self.applications = applications
         self.activations = activations
-    
+
     def customer_information_table(self) -> pd.DataFrame:
         num_entries = self.applications
         contract_keys = set()
@@ -27,14 +26,29 @@ class PseudoData:
 
         phones = [random.choice(['082', '076', '086', '081', '061', '084']) + ''.join(random.choices('0123456789', k=7)) for i in range(num_entries)]
 
+        agent_codes = []
+        for i in range(num_entries):
+            if date_of_births[i].year < 1980 and nett_salaries[i] < 5000 and genders[i] == 'male' and provinces[i] in ['EC', 'NC', 'WC'] and languages[i] in ['Xhosa', 'English']:
+                agent_codes.append(1)
+            elif date_of_births[i].year > 1990 and nett_salaries[i] < 10000 and genders[i] == 'male' and provinces[i] in ['KZN', 'GP'] and languages[i] in ['Zulu', 'English']:
+                agent_codes.append(2)
+            elif date_of_births[i].year > 1980 and nett_salaries[i] > 10000 and genders[i] == 'female' and provinces[i] in ['GP', 'WC', 'MP', 'LP'] and languages[i] == 'English':
+                agent_codes.append(3)
+            elif date_of_births[i].year > 1995 and nett_salaries[i] < 10000 and languages[i] in ['Sesotho', 'English'] and provinces[i] in ['FS', 'MP', 'LP', 'NW']:
+                agent_codes.append(4)
+            elif date_of_births[i].year < 1970 and nett_salaries[i] < 10000 and genders[i] == 'female' and languages[i] in ['English', 'Afrikaans'] and provinces[i] in ['WC', 'NC']:
+                agent_codes.append(5)
+            else:
+                agent_codes.append(random.randint(1, 5))
+
         data = {'contract_key': list(contract_keys),
                 'date_of_birth': date_of_births,
                 'nett_salary': nett_salaries,
                 'gender': genders,
                 'province': provinces,
                 'language': languages,
-                'phone': phones}
-
+                'phone': phones,
+                'agent_code': agent_codes}
 
         ci = pd.DataFrame(data)
 
@@ -43,6 +57,7 @@ class PseudoData:
         self.ci = ci
 
         return ci
+    
 
     def sales_table(self) -> pd.DataFrame:
         # create the sales dataframe
@@ -54,12 +69,9 @@ class PseudoData:
 
         subset_contract_keys = [self.ci.loc[i, 'contract_key'] for i in subset_indices]
 
-        agent_codes = [random.randint(1, 8) for i in range(subset_size)]
-
-        segments = [random.choice(['orange', 'blue', 'green', 'purple']) for i in range(subset_size)]
+        segments = np.random.choice(['orange', 'blue', 'green', 'purple'], size=subset_size, p=[0.6, 0.2, 0.15, 0.05])
 
         subset_data = {'contract_key': subset_contract_keys,
-                    'agent_code': agent_codes,
                     'segment': segments}
 
         sales = pd.DataFrame(subset_data)
@@ -67,19 +79,19 @@ class PseudoData:
         return sales
     
     def agent_info_table(self) -> pd.DataFrame:
-        names = ['adrian', 'xolani', 'prince', 'roxanne', 'tanita', 'asanda', 'ariel', 'mikayla']
-        num_agents = len(names)
 
-        agent_codes = [i+1 for i in range(num_agents)]
+        data = {'agent_code': [1, 2, 3, 4, 5],
+        'agent_name': ['Xolani', 'Asanda', 'Ariel', 'Prince', 'Tanita']}
 
-        agent_names = names
+        agents = pd.DataFrame(data)
 
-        genders = ['male' if name in ['adrian', 'xolani', 'prince', 'asanda'] else 'female' for name in agent_names]
+        return agents
 
-        data = {'agent_code': agent_codes,
-                'agent_name': agent_names,
-                'gender': genders}
+# x =PseudoData(10000,5000)
 
-        agent_info = pd.DataFrame(data)
+# df1 = x.customer_information_table()
 
-        return agent_info
+# df2 = x.sales_table()
+
+# print(df1.head())
+# print(df2.head())

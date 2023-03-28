@@ -1,5 +1,7 @@
 from data_generator import PseudoData
 from mongodb_connector import MongoConnection
+import pymongo
+from pymongo import MongoClient
 
 
 def main():
@@ -14,8 +16,7 @@ def main():
 
     # You will need to insert the password in the string below
 
-    cluster = MongoConnection("lliebenberg93",<PASSWORD>,"phobos.psf7kxf.mongodb.net/?retryWrites=true&w=majority")
-
+    cluster = MongoClient("mongodb+srv://lliebenberg93:<PASSWORD>@phobos.psf7kxf.mongodb.net/?retryWrites=true&w=majority") 
     # Customer Information
 
     db = cluster["sales_demo"] # databse
